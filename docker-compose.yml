@@ -6,7 +6,7 @@ services:
       - USER_ID=999
       - GROUP_ID=995
     network_mode: "host"
-    # restart: always
+    restart: always
     tty: true
     volumes:
       - /etc/localtime:/etc/localtime:ro
@@ -17,11 +17,7 @@ services:
     ports: 
       - "8080:8080"
       - "8433:8433"
-
-  nginx:
-    image: nginx
-    volumes:
-        
+       
 volumes:
   openhab_conf:
   openhab_userdata:
