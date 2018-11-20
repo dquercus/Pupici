@@ -1,5 +1,11 @@
 version: "2"
 services:
+  mqtt:
+    image:  eclipse-mosquitto
+    volumes:
+      - "mosquitto_config:/mosquitto/config"
+      - "mosquitto_data:/mosquitto/data"
+      - "mosquitto_log:/mosquitto/log"
   openhab:
     image: "openhab/openhab:2.3.0-armhf-debian"
     environment:
@@ -17,6 +23,8 @@ services:
     ports: 
       - "8080:8080"
       - "8433:8433"
+    links:
+      - "mqtt:broker"
   nodered:
     image: "nodered/node-red-docker:rpi"
     restart: always
@@ -24,9 +32,13 @@ services:
       - "nodered_userdata:/data"
     ports: 
       - "1880:1880"
-
+    links:
+      - "mqtt:broker"
 volumes:
   openhab_conf:
   openhab_userdata:
   openhab_addons:
   nodered_userdata:
+  mosquitto_config:
+  mosquitto_data:
+  mosquitto_log:
