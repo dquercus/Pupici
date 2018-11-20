@@ -17,8 +17,16 @@ services:
     ports: 
       - "8080:8080"
       - "8433:8433"
-       
+  nodered:
+    image: "nodered/node-red-docker:rpi"
+    restart: always
+    volumes:
+      - "nodered_userdata:/data"
+    ports: 
+      - "1880:1880"
+
 volumes:
   openhab_conf:
   openhab_userdata:
   openhab_addons:
+  nodered_userdata:
