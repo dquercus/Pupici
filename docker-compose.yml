@@ -1,40 +1,125 @@
-version: "2"
+version: "3"
 services:
+  reverse-proxy:
+    image: "traefik:alpine" # The official Traefik docker image
+    container_name: traefik
+    command: --api --docker # Enables the web UI and tells Traefik to listen to docker
+    ports:
+      - "80:80"     # The HTTP port
+      - "443:443"
+    volumes:
+      - "./traefik/traefik.toml:/traefik.toml"
+      - "traefik_logs:/var/log/traefik"       
+      - /var/run/docker.sock:/var/run/docker.sock # So that Traefik can listen to the Docker events
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=traefik"
+      - "traefik.frontend.rule=PathPrefixStrip: /traefik"
+      - "traefik.port=8080"
+      - "traefik.docker.network=pupici_internal"      
+    networks:
+      - default
+      - internal
+  theia: # Web IDE to we can modify conf files from a browser.
+    image: "theiaide/theia:latest"
+    container_name: theia
+    volumes:
+      - "openhab_conf:/home/project/openhab_conf:rw"
+      - "./openhab/conf/services/:/home/project/openhab_conf/services/:rw"
+      - "openhab_userdata:/home/project/openhab_userdata/:ro"
+      - "./mosquitto/:/home/project/mosquitto/config:rw"
+      - "mosquitto_log:/home/project/mosquitto/log:ro"
+    networks:
+      - internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=theia"
+      - "traefik.frontend.rule=PathPrefixStrip: /theia"
+      - "traefik.port=3000"
+      - "traefik.docker.network=pupici_internal"      
   mqtt:
     image:  eclipse-mosquitto
+    container_name: mqtt    
     volumes:
-      - "mosquitto_config:/mosquitto/config"
+      - "./mosquitto/:/mosquitto/config"
       - "mosquitto_data:/mosquitto/data"
       - "mosquitto_log:/mosquitto/log"
+    ports:
+      - "9001:9001" # Websocket port so we can connect from outside.
+    networks:
+      - internal    
+    labels:
+      - "traefik.enable=false"
   openhab:
-    image: "openhab/openhab:2.3.0-armhf-debian"
-    environment:
-      - USER_ID=999
-      - GROUP_ID=995
-    network_mode: "host"
-    restart: always
+    image: "openhab/openhab:2.3.0-amd64-debian"
+    container_name: openhab
     tty: true
+    ports:
+      - "2001:2001" # Homematic Binding RF components
+      - "9128:9128" # Homematic Binding BIN-RPC      
+      - "9127:9127" # Homematic Binding XML-RPC      
+      - "9125:9125" # Homematic Binding XML-RPC
+      - "9126:9126" # Homematic Binding BIN-RPC 
+      - "43439:43439/udp" #Homematic Binding CCU Autodiscovery
+    environment:
+      - USER_ID=1001
+      - GROUP_ID=1001     
     volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+#      - /etc/localtime:/etc/localtime:ro
+#      - /etc/timezone:/etc/timezone:ro
       - "openhab_conf:/openhab/conf"
+      - "./openhab/conf/services/:/openhab/conf/services/"
       - "openhab_userdata:/openhab/userdata"
       - "openhab_addons:/openhab/addons"
-    ports: 
-      - "8080:8080"
-      - "8433:8433"
+    depends_on:
+      - mqtt
     links:
-      - "mqtt:broker"
+      - "mqtt:broker"      
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=openhab"
+      - "traefik.frontend.rule=PathPrefixStrip: /"
+      - "traefik.port=8080"
+      - "traefik.docker.network=pupici_internal"     
+      - "traefik.passHostHeader= true"      
+    networks:
+      - internal      
   nodered:
-    image: "nodered/node-red-docker:rpi"
-    restart: always
+    image: "nodered/node-red-docker:latest"
+    container_name: nodered    
     volumes:
       - "nodered_userdata:/data"
-    ports: 
-      - "1880:1880"
+    depends_on:
+      - mqtt
+      - openhab
     links:
       - "mqtt:broker"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=nodered"
+      - "traefik.frontend.rule=PathPrefixStrip: /nodered"
+      - "traefik.port=1880"
+      - "traefik.docker.network=pupici_internal"      
+    networks:
+      - internal
+  grafana:
+    image: "grafana/grafana"
+    container_name: grafana
+    environment:
+      - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana     
+      - GF_SECURITY_ADMIN_PASSWORD=secret
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=grafana"
+      - "traefik.frontend.rule=PathPrefixStrip: /grafana"
+      - "traefik.port=3000"
+      - "traefik.docker.network=pupici_internal"      
+    networks:
+      - internal
 volumes:
+  traefik_etc:
+  traefik_logs:
+  openhab_logs:
   openhab_conf:
   openhab_userdata:
   openhab_addons:
@@ -42,3 +127,5 @@ volumes:
   mosquitto_config:
   mosquitto_data:
   mosquitto_log:
+networks:
+  internal:

@@ -1,0 +1,22 @@
+defaultEntryPoints = ["http"]
+
+logLevel = "INFO" #DEBUG, INFO, WARN, ERROR, FATAL, PANIC
+
+[entryPoints]
+  [entryPoints.http]
+  address = ":80"
+
+[traefikLog]
+  filePath = "/var/log/traefik/traefik.log.json"
+  format   = "json"
+
+[accessLog]
+  filePath = "/var/log/traefik/access.log.json"
+  format = "json"
+
+# Connection to docker host system (docker.sock)
+[docker]
+watch = true
+# This will hide all docker containers that don't have explicitly  
+# set label to "enable"
+exposedbydefault = false
