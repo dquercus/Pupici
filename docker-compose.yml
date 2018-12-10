@@ -24,8 +24,8 @@ services:
     image: "theiaide/theia:latest"
     container_name: theia
     volumes:
-      - "./openhab/conf:/openhab/conf"      
-      - "openhab_userdata:/home/project/openhab_userdata/:ro"
+      - "openhab_conf:/home/project/openhab/conf:rw"
+      - "openhab_userdata:/home/project/openhab/userdata/:ro"
       - "./mosquitto/:/home/project/mosquitto/config:rw"
       - "mosquitto_log:/home/project/mosquitto/log:ro"
     networks:
@@ -64,13 +64,8 @@ services:
       - "9125:9125" # Homematic Binding XML-RPC
       - "9126:9126" # Homematic Binding BIN-RPC 
       - "43439:43439/udp" #Homematic Binding CCU Autodiscovery
-    environment:
-      - USER_ID=1001
-      - GROUP_ID=1001     
     volumes:
-#      - /etc/localtime:/etc/localtime:ro
-#      - /etc/timezone:/etc/timezone:ro
-      - "./openhab/conf:/openhab/conf"
+      - "openhab_conf:/openhab/conf:ro"
       - "openhab_userdata:/openhab/userdata"
       - "openhab_addons:/openhab/addons"
     depends_on:
@@ -122,6 +117,7 @@ volumes:
   traefik_etc:
   traefik_logs:
   openhab_logs:
+  openhab_conf:
   openhab_userdata:
   openhab_addons:
   nodered_userdata:

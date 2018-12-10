@@ -1,0 +1,14 @@
+openhab:
+  volumes:
+    - /etc/localtime:/etc/localtime:ro
+    - /etc/timezone:/etc/timezone:ro
+  environment:
+    - USER_ID=999
+    - GROUP_ID=998
+theia:
+  volumes:
+    - /etc/localtime:/etc/localtime:ro
+    - /etc/timezone:/etc/timezone:ro
+  environment:
+    - USER_ID=999
+    - GROUP_ID=998
