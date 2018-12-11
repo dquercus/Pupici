@@ -14,3 +14,10 @@ services:
     environment:
       - USER_ID=999
       - GROUP_ID=998
+    user: 999:998
+  nodered:
+    environment:
+      - USER_ID=999
+      - GROUP_ID=998
+  mqtt:
+    user: 999:998

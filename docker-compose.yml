@@ -28,6 +28,7 @@ services:
       - "openhab_userdata:/home/project/openhab/userdata/:ro"
       - "./mosquitto/:/home/project/mosquitto/config:rw"
       - "mosquitto_log:/home/project/mosquitto/log:ro"
+      - "nodered_userdata:/home/project/nodereddata:rw"
     networks:
       - internal
     labels:
