@@ -28,7 +28,7 @@ services:
       - "openhab_userdata:/home/project/openhab/userdata/:ro"
       - "./mosquitto/:/home/project/mosquitto/config:rw"
       - "mosquitto_log:/home/project/mosquitto/log:ro"
-      - "nodered_userdata:/home/project/nodered/data:rw"
+      - "nodered_userdata:/home/project/nodered/  data:rw"
     networks:
       - internal
     labels:
@@ -114,6 +114,35 @@ services:
       - "traefik.docker.network=pupici_internal"      
     networks:
       - internal
+  influxdb:
+    image: "influxdb:1.5.4"
+    container_name: influxdb
+    volumes:
+      - "influxdb:/var/lib/influxdb"
+    labels:
+      - "traefik.enable=false"
+    networks:
+      - internal
+  # Define a Chronograf service
+  chronograf:
+    image: "chronograf:1.5.0.1"
+    container_name: chronograf
+    command: --influxdb-url=http://influxdb:8086 --basepath /chronograf
+    volumes:
+      - "chronograf_data:/var/lib/chronograf"
+    ports:
+      - 8888:8888      
+    links:
+      - influxdb     
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=chronograf"
+      - "traefik.frontend.rule=PathPrefixStrip: /chronograf"
+      - "traefik.port=8888"
+      - "traefik.docker.network=pupici_internal"      
+    networks:
+      - internal
+
 volumes:
   traefik_etc:
   traefik_logs:
@@ -125,5 +154,7 @@ volumes:
   mosquitto_config:
   mosquitto_data:
   mosquitto_log:
+  influxdb:
+  chronograf_data:
 networks:
   internal:
