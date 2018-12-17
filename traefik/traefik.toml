@@ -1,10 +1,18 @@
-defaultEntryPoints = ["http"]
+defaultEntryPoints = ["http", "https"]
 
 logLevel = "INFO" #DEBUG, INFO, WARN, ERROR, FATAL, PANIC
 
 [entryPoints]
   [entryPoints.http]
   address = ":80"
+    [entryPoints.http.redirect]
+    entryPoint = "https"
+  [entryPoints.https]
+    address = ":443"
+      [entryPoints.https.tls]
+        [[entryPoints.https.tls.certificates]]
+        certFile = "/etc/traefik/assets/secure.pupici-prd.crt"
+        keyFile = "/etc/traefik/assets/secure.pupici-prd.key.insecure"
 
 [traefikLog]
   filePath = "/var/log/traefik/traefik.log.json"
