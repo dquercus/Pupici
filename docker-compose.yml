@@ -55,7 +55,7 @@ services:
       - "traefik.port=9001"
       - "traefik.docker.network=pupici_internal"      
   openhab:
-    image: "openhab/openhab:2.3.0-amd64-debian"
+    image: "openhab/openhab:2.4.0-amd64-debian"
     container_name: openhab
     tty: true
     ports:
