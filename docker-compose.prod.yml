@@ -4,6 +4,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
+      - "/mnt/backup/pupici-prd/openhab/:/mnt/backup:rw"
     environment:
       - USER_ID=999
       - GROUP_ID=998
@@ -18,4 +19,7 @@ services:
   nodered:
     environment:
       - USER_ID=999
-      - GROUP_ID=998
+      - GROUP_ID=998      
+  influxdb:
+    volumes:
+      - "/mnt/backup/pupici-prd/influxdb/:/mnt/backup:rw"
