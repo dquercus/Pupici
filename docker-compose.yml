@@ -146,7 +146,7 @@ services:
     image: "mcuadros/ofelia:latest"
     container_name: ofelia
     volumes:
-      - ".ofelia/:/etc/ofelia"
+      - "./ofelia/config.ini:/etc/ofelia/config.ini"
 volumes:
   traefik_etc:
   traefik_logs:
