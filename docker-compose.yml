@@ -66,7 +66,7 @@ services:
       - "9126:9126" # Homematic Binding BIN-RPC 
       - "43439:43439/udp" #Homematic Binding CCU Autodiscovery
     environment:      
-      - OPENHAB_BACKUPS=/mnt/backup/
+      - OPENHAB_BACKUPS=/mnt/backup
     volumes:
       - "openhab_conf:/openhab/conf:rw"
       - "openhab_userdata:/openhab/userdata:rw"
@@ -142,7 +142,11 @@ services:
       - "traefik.docker.network=pupici_internal"      
     networks:
       - internal
-
+  ofelia:
+    image: "mcuadros/ofelia:latest"
+    container_name: ofelia
+    volumes:
+      - ".ofelia/:/etc/ofelia"
 volumes:
   traefik_etc:
   traefik_logs:
