@@ -65,6 +65,7 @@ services:
       - "9125:9125" # Homematic Binding XML-RPC
       - "9126:9126" # Homematic Binding BIN-RPC 
       - "43439:43439/udp" #Homematic Binding CCU Autodiscovery
+      - "1900:1900/udp" #SSDP
     environment:      
       - OPENHAB_BACKUPS=/mnt/backup
     volumes:
