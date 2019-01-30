@@ -2,18 +2,17 @@
 Description=%i service with docker compose
 Requires=docker.service
 After=docker.service
-User=pupici
 
 [Service]
 Restart=always
-
+User=pupici
 WorkingDirectory=/opt/Pupici-HA/pupici/
 
 # Compose up
-ExecStart=docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+ExecStart=/usr/local/bin/docker-compose -f /opt/Pupici-HA/pupici/docker-compose.yml -f /opt/Pupici-HA/pupici/docker-compose.prod.yml up -d
 
 # Compose down
-ExecStop=docker-compose -f docker-compose.yml -f docker-compose.prod.yml down
+ExecStop=/usr/local/bin/docker-compose -f /opt/Pupici-HA/pupici/docker-compose.yml -f /opt/Pupici-HA/pupici/docker-compose.prod.yml down
 
 [Install]
 WantedBy=multi-user.target
